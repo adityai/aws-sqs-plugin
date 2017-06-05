@@ -1,0 +1,19 @@
+dependencies:
+  pre: 
+   - sudo service docker start; sudo service docker status; sudo docker -v; sudo docker info; 
+   
+  post:
+   - sudo docker build -t=sqs_plugin_build .
+   - sudo docker run --name sqs_plugin_build -v /home/ubuntu:/usr/src/app -d sqs_plugin_build
+   - sudo docker save -o $CIRCLE_ARTIFACTS/sqs_plugin_build.tar sqs_plugin_build
+
+deployment:
+  dockerhub:
+    branch: master
+    commands:
+      - $DOCKER_HUB_TRIGGER
+      
+test:
+  override:
+  - docker images | grep sqs_plugin_build 
+  
